@@ -10,10 +10,11 @@ export default function ContactForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
     setStatus('loading');
     setErrorMessage('');
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const data = Object.fromEntries(formData);
 
     try {
@@ -24,14 +25,16 @@ export default function ContactForm() {
       });
 
       const result = (await res.json().catch(() => ({}))) as {
+        success?: boolean;
         message?: string;
         code?: string;
         detail?: string;
       };
 
-      if (res.ok) {
+      if (res.ok && result.success !== false) {
         setStatus('success');
-        e.currentTarget.reset();
+        setErrorMessage('');
+        form.reset();
         return;
       }
 
